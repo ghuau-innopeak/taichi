@@ -107,6 +107,8 @@ class VkRuntime {
 
   void add_root_buffer(size_t root_buffer_size);
 
+  void read_memory(uint8_t *ptr, uintptr_t offset, size_t size) const;
+
  private:
   void init_buffers();
 

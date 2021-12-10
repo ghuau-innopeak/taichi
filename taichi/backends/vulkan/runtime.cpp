@@ -492,10 +492,10 @@ void VkRuntime::add_root_buffer(size_t root_buffer_size) {
     root_buffer_size = 4;  // there might be empty roots
   }
   std::unique_ptr<DeviceAllocationGuard> new_buffer =
-      device_->allocate_memory_unique(
-          {root_buffer_size,
-           /*host_write=*/false, /*host_read=*/false,
-           /*export_sharing=*/false, AllocUsage::Storage});
+      device_->allocate_memory_unique({root_buffer_size,
+                                       /*host_write=*/true, /*host_read=*/true,
+                                       /*export_sharing=*/false,
+                                       AllocUsage::Storage});
   Stream *stream = device_->get_compute_stream();
   auto cmdlist = stream->new_command_list();
   cmdlist->buffer_fill(new_buffer->get_ptr(0), root_buffer_size, /*data=*/0);
@@ -525,6 +525,12 @@ VkRuntime::RegisterParams run_codegen(
   VkRuntime::RegisterParams res;
   codegen.run(res.kernel_attribs, res.task_spirv_source_codes);
   return std::move(res);
+}
+
+void VkRuntime::read_memory(uint8_t *ptr, uintptr_t offset, size_t size) const {
+  uint8_t *buffer = (uint8_t *)device_->map(*(root_buffers_[0]));
+  memcpy(ptr, buffer + offset, size);
+  device_->unmap(*(root_buffers_[0]));
 }
 
 }  // namespace vulkan
