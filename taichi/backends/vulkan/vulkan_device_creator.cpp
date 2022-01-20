@@ -411,29 +411,6 @@ void VulkanDeviceCreator::create_logical_device() {
     } else if (name == VK_KHR_SWAPCHAIN_EXTENSION_NAME) {
       has_swapchain = true;
       enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_EXT_SHADER_ATOMIC_FLOAT_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_EXT_SHADER_ATOMIC_FLOAT_2_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_SHADER_ATOMIC_INT64_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_SPIRV_1_4_EXTENSION_NAME) {
-      ti_device_->set_cap(DeviceCapability::spirv_version, 0x10400);
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME ||
-               name == VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME) {
-      ti_device_->set_cap(DeviceCapability::vk_has_external_memory, true);
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (name == VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME) {
-      enabled_extensions.push_back(ext.extensionName);
-    } else if (std::find(params_.additional_device_extensions.begin(),
-                         params_.additional_device_extensions.end(),
-                         name) != params_.additional_device_extensions.end()) {
-      enabled_extensions.push_back(ext.extensionName);
     }
   }
 
@@ -454,10 +431,12 @@ void VulkanDeviceCreator::create_logical_device() {
     device_features.shaderInt64 = true;
     ti_device_->set_cap(DeviceCapability::spirv_has_int64, true);
   }
+#if 0
   if (device_supported_features.shaderFloat64) {
     device_features.shaderFloat64 = true;
     ti_device_->set_cap(DeviceCapability::spirv_has_float64, true);
   }
+#endif
   if (device_supported_features.wideLines) {
     device_features.wideLines = true;
     ti_device_->set_cap(DeviceCapability::wide_lines, true);
@@ -473,6 +452,7 @@ void VulkanDeviceCreator::create_logical_device() {
   void **pNextEnd = (void **)&create_info.pNext;
 
   // Use physicalDeviceFeatures2 to features enabled by extensions
+#if 0
   VkPhysicalDeviceVariablePointersFeaturesKHR variable_ptr_feature{};
   variable_ptr_feature.sType =
       VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES_KHR;
@@ -571,6 +551,7 @@ void VulkanDeviceCreator::create_logical_device() {
 
     // TODO: add atomic min/max feature
   }
+#endif
 
   if constexpr (kEnableValidationLayers) {
     create_info.enabledLayerCount = (uint32_t)kValidationLayers.size();
